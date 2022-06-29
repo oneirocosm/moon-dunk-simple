@@ -13,6 +13,14 @@ const DOLLAR_GOAL = 800.0;
 // but don't change these unless something has gone very wrong
 const TIME_PER_DOLLAR = BUCKET_VOLUME / (WATER_RATE * DOLLAR_GOAL);
 const MS_PER_S = 1000.0;
+const opts = {
+    reconnect: true
+};
+
+function sleep(seconds) {
+    const ms = seconds * MS_PER_S;
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const solenoidCtrl = new Gpio(PIN_NUM, 'out');
 const socket = io.connect(`https://sockets.streamlabs.com/?token=${TOKEN}`, opts);
@@ -52,9 +60,4 @@ while (true) {
             }
         }
     });
-}
-
-function sleep(seconds) {
-    const ms = seconds * MS_PER_S;
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
