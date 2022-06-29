@@ -1,0 +1,32 @@
+{
+  "name": "moon-dunk-simple",
+  "version": "0.1.0",
+  "description": "A simpler version of the moon dunk application that should be able to run on its own on a raspberry pi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "npm index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oneirocosm/moon-dunk-simple.git"
+  },
+  "keywords": [
+    "moonshot",
+    "dunk",
+    "streamlabs",
+    "donation"
+  ],
+  "author": "oneirocosm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oneirocosm/moon-dunk-simple/issues"
+  },
+  "homepage": "https://github.com/oneirocosm/moon-dunk-simple#readme",
+  "dependencies": {
+    "easy-currencies": "^1.7.0",
+    "log-to-file": "^3.0.0",
+    "onoff": "^6.0.3",
+    "socket.io-client": "^4.5.1"
+  }
+}
