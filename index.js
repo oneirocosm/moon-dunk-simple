@@ -4,7 +4,6 @@ const log = require("log-to-file");
 let Gpio = require("onoff").Gpio;
 
 // you can change this stuff for setup
-//const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjJjYmMyMzI3YWE5NjkwNDA3MDJiNzdhIiwicm9sZSI6Im93bmVyIiwiY2hhbm5lbCI6IjYyY2JjMjMyN2FhOTY5ZGVjNDAyYjc3YiIsInByb3ZpZGVyIjoidHdpdGNoIiwiYXV0aFRva2VuIjoiRVp1alFkd0dVV1BDcXBiYmlXTkVjbkUtVjRIeG10WDUxTlp4aVZGRE5md1ctNm1xIiwiaWF0IjoxNjU3NTI1NTkzLCJpc3MiOiJTdHJlYW1FbGVtZW50cyJ9.O6DnCGp17-Vm7LRaFCBemDGCwPLjJtJFMgWBktfXtcg";
 const TOKEN = "";
 const PIN_NUM = 26;
 const WATER_RATE = 5.0; // gallons
