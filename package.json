@@ -27,6 +27,6 @@
     "easy-currencies": "^1.7.0",
     "log-to-file": "^3.0.0",
     "onoff": "^6.0.3",
-    "socket.io-client": "^4.5.1"
+    "socket.io-client": "2.2.0"
   }
 }
