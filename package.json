@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/oneirocosm/moon-dunk-simple#readme",
   "dependencies": {
+    "dotenv": "^16.0.1",
     "easy-currencies": "^1.7.0",
     "log-to-file": "^3.0.0",
     "onoff": "^6.0.3",

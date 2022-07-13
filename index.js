@@ -1,29 +1,34 @@
+require('dotenv').config();
 const io = require("socket.io-client");
 const { Convert } = require("easy-currencies");
 const log = require("log-to-file");
-let Gpio = require("onoff").Gpio;
+let Gpio;
+if (process.env.DEBUG === "true") {
+    Gpio = require("./debug-tools").Gpio;
+} else {
+    Gpio = require("onoff").Gpio;
+}
 
 // you can change this stuff for setup
-const TOKEN = "";
-const PIN_NUM = 26;
-const WATER_RATE = 5.0; // gallons
-const BUCKET_VOLUME = 0.2; // gallons per second
-const DOLLAR_GOAL = 800.0;
+const WATER_RATE = 0.15; // gallons_per_second
+const BUCKET_VOLUME = 2.0; // gallons
+const DOLLAR_GOAL = 65.0;
 
 // but don't change these unless something has gone very wrong
 const TIME_PER_DOLLAR = BUCKET_VOLUME / (WATER_RATE * DOLLAR_GOAL);
 const MS_PER_S = 1000.0;
 const opts = {
-    //reconnect: true,
+    reconnect: true,
     transports: ['websocket'],
 };
 
-const solenoidCtrl = new Gpio(PIN_NUM, 'out');
+const solenoidCtrl = new Gpio(Number(process.env.PIN_NUM), 'out');
 const socket = io.connect('https://realtime.streamelements.com', opts);
 const eventQueue = [];
 
 log("\n\n");
 log(`Program starting at ${Date.now()}`);
+
 // set pin high to start (no water flows)
 solenoidCtrl.writeSync(1);
 console.log('pin high');
@@ -83,7 +88,7 @@ function onEvent(data) {
 
 function onConnect() {
     console.log('Successfully connected to websocket. Beginning authentication ...');
-    socket.emit('authenticate', {method: 'jwt', token: TOKEN});
+    socket.emit('authenticate', {method: 'jwt', token: process.env.JWT_TOKEN});
 }
 
 function onDisconnect() {
@@ -98,7 +103,7 @@ function onAuthenticated(data) {
     console.log(`Successfully connected to channel ${channelId}`);
 }
 
-function sleep(seconds) {
+async function sleep(seconds) {
     const ms = seconds * MS_PER_S;
     return new Promise(resolve => setTimeout(resolve, ms));
 }
