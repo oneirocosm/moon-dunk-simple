@@ -6,8 +6,7 @@ class Gpio {
     }
 
     writeSync(status) {
-        console.log('Debug only.  This is only simulating pin control');
-        console.log(`Pin ${this.pin} is being set from ${this.status} to ${status}`);
+        console.log(`Debug only.  This is only simulating pin control: Pin ${this.pin} is being set from ${this.status} to ${status}`);
         this.status = status;
     }
 }

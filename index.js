@@ -40,6 +40,7 @@ async function main() {
     // set pin high to start (no water flows)
     solenoidCtrl.writeSync(1);
 
+    // reload old queue if events are left over
     await storage.init();
     eventQueue = new Queue(storage);
     await eventQueue.loadStored();
@@ -56,11 +57,9 @@ async function main() {
 
 async function processDunks() {
     if (eventQueue.length() != 0) {
-        console.log("Preparing to dispense in 5 seconds");
-        await new Promise(r => setTimeout(r, 5000));
         await processNext();
     }
-    setTimeout(processDunks);
+    setTimeout(processDunks, 100);
 }
 
 async function processNext() {
@@ -68,27 +67,28 @@ async function processNext() {
 
     const amountUsd = await currencyConverter.from(event.data.currency).to("USD").amount(event.data.amount).convert();
     const duration = amountUsd * TIME_PER_DOLLAR;
-    const msg = `${event.data.username} donated $${amountUsd} USD for ${duration} seconds of water`;
+    const msg = `\n${event.data.username} donated $${amountUsd} USD for ${duration} seconds of water`;
     log(msg);
     console.log(msg);
+    console.log("Preparing to dispense in 5 seconds");
+    await new Promise(r => setTimeout(r, 5000));
+
+    await eventQueue.dequeue();
 
     // set pin low (water flows)
     solenoidCtrl.writeSync(0);
-    console.log("starting water");
+    console.log("Dispensing water");
 
     await new Promise(r => setTimeout(r, duration * MS_PER_S));
 
     // set pin high (water stops)
     solenoidCtrl.writeSync(1);
-    console.log("ending water");
-    await eventQueue.dequeue();
+    console.log(`Water for ${event.data.username} finished dispensing`);
 }
 
 async function onEventTest(data) {
-    log(`${JSON.stringify(data)}`);
-    //console.log('\n');
-
-    log(`New streamelements event: ${data.listener} at ${Date.now()}`);
+    log(`Test: ${JSON.stringify(data)}`);
+    log(`New streamelements event: ${data.listener}`);
 
     if (data.listener == "tip-latest") {
         const originalFormat = data.event;
@@ -98,10 +98,8 @@ async function onEventTest(data) {
 }
 
 async function onEvent(event) {
-    console.log(`${JSON.stringify(event)}`);
-    log(`${JSON.stringify(event)}`);
-
-    log(`New streamelements event: ${event.type} at ${Date.now()}`);
+    log(`Real: ${JSON.stringify(event)}`);
+    log(`New streamelements event: ${event.type}`);
 
     if (event.type == "tip") {
         await eventQueue.enqueue(event);
