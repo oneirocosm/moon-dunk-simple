@@ -1,0 +1,17 @@
+{
+    "_id": "",
+    "channel": "",
+    "type": "tip",
+    "provider": "twitch",
+    "createdAt": "time",
+    "data": {
+        "tipId": "",
+        "username": "",
+        "amount": 1,
+        "currency": "USD",
+        "message": "",
+        "avatar": "url"
+    },
+    "updatedAt": "time",
+    "activityId": ""
+}

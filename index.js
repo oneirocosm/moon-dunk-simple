@@ -33,7 +33,6 @@ log(`Program starting at ${Date.now()}`);
 
 // set pin high to start (no water flows)
 solenoidCtrl.writeSync(1);
-console.log('pin high');
 
 socket.on('connect', onConnect);
 socket.on('disconnect', onDisconnect);
@@ -46,7 +45,7 @@ processDunks();
 
 async function processDunks() {
     if (eventQueue.length != 0) {
-        console.log("Preparing to dunk in 5 seconds");
+        console.log("Preparing to dispense in 5 seconds");
         await new Promise(r => setTimeout(r, 5000));
         await processNext();
     }
@@ -56,47 +55,47 @@ async function processDunks() {
 async function processNext() {
     const event = eventQueue.shift();
 
-    const amountUsd = await currencyConverter.from(event.currency).to("USD").amount(event.amount).convert();
+    const amountUsd = await currencyConverter.from(event.data.currency).to("USD").amount(event.data.amount).convert();
     const duration = amountUsd * TIME_PER_DOLLAR;
-    const msg = `${event.name} donated $${amountUsd} USD for ${duration} seconds of water`;
+    const msg = `${event.data.username} donated $${amountUsd} USD for ${duration} seconds of water`;
     log(msg);
     console.log(msg);
 
     // set pin low (water flows)
     solenoidCtrl.writeSync(0);
-    console.log("starting dunk");
+    console.log("starting water");
 
     await new Promise(r => setTimeout(r, duration * MS_PER_S));
 
     // set pin high (water stops)
     solenoidCtrl.writeSync(1);
-    console.log("ending dunk");
+    console.log("ending water");
 }
 
 function onEventTest(data) {
-    //console.log(`${JSON.stringify(data)}`);
+    log(`${JSON.stringify(data)}`);
     //console.log('\n');
 
     log(`New streamelements event: ${data.listener} at ${Date.now()}`);
 
     if (data.listener == "tip-latest") {
         //for (const instance of data.event) {
-        let event = data.event;
-        event.currency = "USD";
-        eventQueue.push(event);
+        const originalFormat = data.event;
+        const newFormat = convertTestToReal(originalFormat);
+        eventQueue.push(newFormat);
         //}
     }
 }
 
-function onEvent(data) {
-    console.log(`${JSON.stringify(data)}`);
-    log(`${JSON.stringify(data)}`);
+function onEvent(event) {
+    console.log(`${JSON.stringify(event)}`);
+    log(`${JSON.stringify(event)}`);
 
-    log(`New streamelements event: ${data.listener} at ${Date.now()}`);
+    log(`New streamelements event: ${event.type} at ${Date.now()}`);
 
-    if (data.listener == "tip-latest") {
+    if (event.type == "tip") {
         //for (const instance of data.event) {
-            eventQueue.push(data.event);
+            eventQueue.push(event);
         //}
     }
 }
@@ -107,8 +106,7 @@ function onConnect() {
 }
 
 function onDisconnect() {
-    console.log('Disconnected from websocket');
-    // attempt to reconnect?
+    console.log('Disconnected from websocket.  Should reconnect automatically');
 }
 
 function onAuthenticated(data) {
@@ -121,4 +119,24 @@ function onAuthenticated(data) {
 async function sleep(seconds) {
     const ms = seconds * MS_PER_S;
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function convertTestToReal(originalFormat) {
+        return {
+            "_id": Math.floor(Math.random()*16777215).toString(16),
+            "channel": `${originalFormat.name}'s channel`,
+            "type": "tip",
+            "provider": "twitch",
+            "createdAt": "time",
+            "data": {
+                "tipId": String(Math.floor(Math.random()*16777215).toString(16)),
+                "username": originalFormat.name,
+                "amount": originalFormat.amount,
+                "currency": "USD",
+                "message": originalFormat.message,
+                "avatar": "url"
+            },
+            "updatedAt": "time",
+            "activityId": String(Math.floor(Math.random()*16777215).toString(16))
+        };
 }
