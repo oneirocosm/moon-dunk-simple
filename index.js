@@ -34,8 +34,8 @@ const currencyConverter = new CC();
 main();
 
 async function main() {
-    log("\n\n");
-    log(`Program starting at ${Date.now()}`);
+    log(`\n\nProgram starting at ${Date.now()}`);
+    console.log(`\n\nProgram starting at ${Date.now()}`);
     
     // set pin high to start (no water flows)
     solenoidCtrl.writeSync(1);
@@ -70,16 +70,26 @@ async function processNext() {
     const msg = `\n${event.data.username} donated $${amountUsd} USD for ${duration} seconds of water`;
     log(msg);
     console.log(msg);
-    console.log("Preparing to dispense in 5 seconds");
-    await new Promise(r => setTimeout(r, 5000));
+    const formatter = (time) => {
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write(`Preparing to dispense in ${time.toFixed(2)} seconds`);
+    };
+    await timer(5.0, formatter, 0.1)
+    console.log();
 
     await eventQueue.dequeue();
 
     // set pin low (water flows)
     solenoidCtrl.writeSync(0);
-    console.log("Dispensing water");
 
-    await new Promise(r => setTimeout(r, duration * MS_PER_S));
+    const dispenseMsgr = (time) => {
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write(`Dispensing water: ${time.toFixed(2)}`);
+    }
+    await timer(duration, dispenseMsgr, 0.1);
+    console.log()
 
     // set pin high (water stops)
     solenoidCtrl.writeSync(1);
@@ -145,4 +155,12 @@ function convertTestToReal(originalFormat) {
         "updatedAt": "time",
         "activityId": String(Math.floor(Math.random()*16777215).toString(16))
     };
+}
+
+async function timer(time, fn, step) {
+    fn(time);
+    while (time > 0.0001) {
+        await new Promise(r => setTimeout(r, step * MS_PER_S));
+        return await timer(Math.max(time - step, 0.0), fn, step);
+    }
 }
