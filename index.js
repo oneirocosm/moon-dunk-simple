@@ -6,7 +6,7 @@ const log = require("log-to-file");
 const storage = require('node-persist')
 const Queue = require("./queue").Queue;
 let Gpio;
-if (process.env.DEBUG === "true") {
+if (process.env.MOONDUNK_DEBUG === "true") {
     Gpio = require("./debug-tools").Gpio;
 } else {
     Gpio = require("onoff").Gpio;
@@ -27,7 +27,7 @@ const opts = {
 
 let eventQueue;
 
-const solenoidCtrl = new Gpio(Number(process.env.PIN_NUM), 'out');
+const solenoidCtrl = new Gpio(Number(process.env.MOONDUNK_PIN), 'out');
 const socket = io.connect('https://realtime.streamelements.com', opts);
 const currencyConverter = new CC();
 
@@ -118,7 +118,7 @@ async function onEvent(event) {
 
 function onConnect() {
     console.log('Successfully connected to websocket. Beginning authentication ...');
-    socket.emit('authenticate', {method: 'jwt', token: process.env.JWT_TOKEN});
+    socket.emit('authenticate', {method: 'jwt', token: process.env.MOONDUNK_JWT});
 }
 
 function onDisconnect() {
