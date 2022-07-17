@@ -13,9 +13,9 @@ if (process.env.MOONDUNK_DEBUG === "true") {
 }
 
 // you can change this stuff for setup
-const WATER_RATE = 0.15; // gallons_per_second
-const BUCKET_VOLUME = 2.0; // gallons
-const DOLLAR_GOAL = 65.0;
+const WATER_RATE = parseFloat(process.env.MOONDUNK_RATE); // estimated gallons_per_second
+const BUCKET_VOLUME = parseFloat(process.env.MOONDUNK_VOLUME); // estemated gallons
+const DOLLAR_GOAL = parseFloat(process.env.MOONDUNK_GOAL); // estimated USD per dunk
 
 // but don't change these unless something has gone very wrong
 const TIME_PER_DOLLAR = BUCKET_VOLUME / (WATER_RATE * DOLLAR_GOAL);
